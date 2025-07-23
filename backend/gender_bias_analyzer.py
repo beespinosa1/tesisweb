@@ -48,17 +48,19 @@ class AdvancedBiasAnalyzer:
     3. Ensemble de ambos métodos
     """
     
-    def __init__(self, lexicon_path: str = "lexicon_definitivo.csv"):
+    def __init__(self, lexicon_path: str = "lexicon_definitivo.csv", tic_lexicon_path: str = "lexicon_tic.csv"):
         """
         Inicializa el analizador con léxico.
-        
         Args:
             lexicon_path: Ruta al archivo CSV del léxico
+            tic_lexicon_path: Ruta al archivo CSV del léxico TIC
         """
         self.lexicon_path = lexicon_path
-        
+        self.tic_lexicon_path = tic_lexicon_path
         # Cargar léxico
         self._load_lexicon()
+        # Cargar léxico TIC
+        self._load_tic_lexicon()
         
         # Cargar modelo spaCy
         logger.info("Cargando modelo spaCy...")
@@ -142,6 +144,28 @@ class AdvancedBiasAnalyzer:
             logger.warning(f"No se pudo cargar el modelo RoBERTa: {e}")
             logger.info("Usando solo analisis lexico")
             self.classifier = None
+    
+    def _load_tic_lexicon(self):
+        """Carga el léxico TIC desde un archivo CSV simple (columna 'termino')."""
+        import csv
+        self.tic_terms = set()
+        try:
+            with open(self.tic_lexicon_path, encoding="utf-8") as f:
+                reader = csv.DictReader(f)
+                for row in reader:
+                    term = row.get("termino", "").strip().lower()
+                    if term:
+                        self.tic_terms.add(self._normalize(term))
+            logger.info(f"Léxico TIC cargado: {len(self.tic_terms)} términos.")
+        except Exception as e:
+            logger.warning(f"No se pudo cargar el léxico TIC: {e}")
+            self.tic_terms = set()
+
+    def is_tic_offer(self, description: str, threshold: int = 2) -> bool:
+        """Determina si una oferta pertenece al área TIC según el léxico TIC."""
+        lemmas = set(self._lemmatize(description))
+        matches = lemmas & self.tic_terms
+        return len(matches) >= threshold
     
     def _normalize(self, txt: str) -> str:
         """Normaliza texto: minúsculas, sin tildes ni espacios sobrantes."""
@@ -254,6 +278,9 @@ class AdvancedBiasAnalyzer:
         # Calcular score contextual basado en RoBERTa
         contextual_score = prob_M / (prob_M + prob_F) if (prob_M + prob_F) > 0 else 0.5
         
+        # Verificar si es oferta TIC
+        is_tic = self.is_tic_offer(text)
+        
         return {
             "lexical_score": round(lex_score, 4),
             "contextual_score": round(contextual_score, 4),
@@ -266,7 +293,8 @@ class AdvancedBiasAnalyzer:
             "roberta_probabilities": {
                 "masculine": round(prob_M, 4),
                 "feminine": round(prob_F, 4)
-            }
+            },
+            "is_tic": is_tic
         }
 
 # Inicializar el analizador global

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Scale, Send, Loader2, AlertCircle, CheckCircle, Info, Cloud, Target } from 'lucide-react';
+import { Scale, Send, Loader2, AlertCircle, CheckCircle, Info, Cloud, Target, AlertTriangle } from 'lucide-react';
 import { apiService } from '../services/api';
 
 const Analyzer = () => {
@@ -143,6 +143,25 @@ const Analyzer = () => {
           <div className="flex items-center">
             <AlertCircle className="h-5 w-5 text-red-500 mr-2" />
             <span className="text-red-700">{error}</span>
+          </div>
+        </div>
+      )}
+
+      {results && results.is_tic === false && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white rounded-lg shadow-lg p-8 max-w-md mx-auto flex flex-col items-center">
+            <AlertTriangle className="h-10 w-10 text-yellow-500 mb-4" />
+            <h2 className="text-xl font-bold text-yellow-700 mb-2">Atención</h2>
+            <p className="text-gray-700 text-center mb-4">
+              El aplicativo fue orientado al campo amplio de Tecnologías de la Información y Comunicación (TIC).<br/>
+              <strong>Su oferta no corresponde al área TIC</strong>, por lo que <strong>los resultados pueden ser erróneos</strong>.
+            </p>
+            <button
+              className="mt-2 px-6 py-2 bg-yellow-500 text-white rounded-lg font-semibold hover:bg-yellow-600 transition"
+              onClick={() => setResults(null)}
+            >
+              Cerrar y analizar otra oferta
+            </button>
           </div>
         </div>
       )}

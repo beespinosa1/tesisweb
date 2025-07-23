@@ -40,6 +40,7 @@ class AnalysisResponse(BaseModel):
     feminine_hits: int
     detected_terms: Dict[str, List[str]]
     roberta_probabilities: Dict[str, float]
+    is_tic: bool
 
 @app.get("/")
 async def root():
@@ -89,7 +90,8 @@ async def analyze_gender_bias(request: AnalysisRequest):
             masculine_hits=results["masculine_hits"],
             feminine_hits=results["feminine_hits"],
             detected_terms=results["detected_terms"],
-            roberta_probabilities=results["roberta_probabilities"]
+            roberta_probabilities=results["roberta_probabilities"],
+            is_tic=results["is_tic"]
         )
         
     except Exception as e:
