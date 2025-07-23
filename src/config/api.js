@@ -21,17 +21,13 @@ const API_CONFIG = {
 
 // Determinar el entorno
 const getEnvironment = () => {
-  if (process.env.NODE_ENV === 'production') {
-    return 'production';
-  }
-  
-  // Para desarrollo, puedes cambiar manualmente aquí
-  // También puedes usar variables de entorno
   if (process.env.REACT_APP_API_MODE === 'ngrok') {
     return 'ngrok';
   }
-  
-  return 'development'; // Cambia a 'ngrok' si usas ngrok
+  if (process.env.NODE_ENV === 'production') {
+    return 'production';
+  }
+  return 'development';
 };
 
 // Exportar la configuración actual

@@ -15,9 +15,10 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:3000",  # URL del frontend React local
-        "https://*.vercel.app",   # Todos los subdominios de Vercel
-        "https://*.ngrok-free.app"  # URLs de ngrok
+        "http://localhost:3000",
+        "https://tesisweb-akz5.vercel.app",
+        "https://tesisweb-akz5-md0p6c0uw-barbaras-projects-c40cbbb4.vercel.app",
+        "https://e8f0f017c553.ngrok-free.app"  # Cambia por tu URL actual de ngrok
     ],
     allow_credentials=True,
     allow_methods=["*"],
