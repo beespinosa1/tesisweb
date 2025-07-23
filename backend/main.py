@@ -14,7 +14,11 @@ app = FastAPI(
 # Configurar CORS para permitir requests desde el frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # URL del frontend React
+    allow_origins=[
+        "http://localhost:3000",  # URL del frontend React local
+        "https://*.vercel.app",   # Todos los subdominios de Vercel
+        "https://*.ngrok-free.app"  # URLs de ngrok
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
