@@ -24,6 +24,9 @@ COPY requirements.txt .
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Fuerza la reinstalación de torch para evitar instalaciones corruptas
+RUN pip uninstall -y torch && pip install torch==2.1.2
+
 # Copia el resto del código
 COPY . .
 
