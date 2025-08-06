@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from typing import Optional, Dict, List
 import uvicorn
@@ -19,6 +20,18 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Endpoint manual para CORS preflight
+@app.options("/api/analyze")
+async def options_analyze():
+    return JSONResponse(
+        content={},
+        headers={
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "POST, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type, Authorization",
+        }
+    )
 
 # Modelo para la request
 class AnalysisRequest(BaseModel):
@@ -76,7 +89,7 @@ async def analyze_gender_bias(request: AnalysisRequest):
         # Realizar el análisis
         results = analyzer.analyze(request.description)
         
-        return AnalysisResponse(
+        response_data = AnalysisResponse(
             lexical_score=results["lexical_score"],
             contextual_score=results["contextual_score"],
             final_prediction=results["final_prediction"],
@@ -87,6 +100,16 @@ async def analyze_gender_bias(request: AnalysisRequest):
             detected_terms=results["detected_terms"],
             roberta_probabilities=results["roberta_probabilities"],
             is_tic=results["is_tic"]
+        )
+        
+        # Retornar con headers CORS manuales
+        return JSONResponse(
+            content=response_data.dict(),
+            headers={
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "POST, OPTIONS",
+                "Access-Control-Allow-Headers": "Content-Type, Authorization",
+            }
         )
         
     except Exception as e:
