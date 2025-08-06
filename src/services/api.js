@@ -2,7 +2,17 @@ import axios from 'axios';
 import { axiosConfig } from '../config/api';
 
 // Crear instancia de axios con configuración
-const apiClient = axios.create(axiosConfig);
+const apiClient = axios.create({
+  ...axiosConfig,
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+  },
+  withCredentials: false
+});
 
 // Interceptor para manejar errores
 apiClient.interceptors.response.use(

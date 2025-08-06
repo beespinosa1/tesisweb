@@ -14,13 +14,8 @@ app = FastAPI(
 # Configurar CORS para permitir requests desde el frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "https://tesisweb-akz5.vercel.app",
-        "https://tesisweb-akz5-md0p6c0uw-barbaras-projects-c40cbbb4.vercel.app",
-        "https://e8f0f017c553.ngrok-free.app"  # Cambia por tu URL actual de ngrok
-    ],
-    allow_credentials=True,
+    allow_origins=["*"],  # Temporalmente permitir todos los orígenes
+    allow_credentials=False,  # Cambiar a False cuando usamos allow_origins=["*"]
     allow_methods=["*"],
     allow_headers=["*"],
 )
