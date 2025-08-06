@@ -6,12 +6,8 @@ const apiClient = axios.create({
   ...axiosConfig,
   headers: {
     'Content-Type': 'application/json',
-    'Accept': 'application/json',
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization'
-  },
-  withCredentials: false
+    'Accept': 'application/json'
+  }
 });
 
 // Interceptor para manejar errores

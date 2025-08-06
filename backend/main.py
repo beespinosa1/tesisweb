@@ -15,10 +15,13 @@ app = FastAPI(
 # Configurar CORS para permitir requests desde el frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Temporalmente permitir todos los orígenes
-    allow_credentials=False,  # Cambiar a False cuando usamos allow_origins=["*"]
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=[
+        "https://tesisweb-akz5.vercel.app",  # Tu dominio exacto de Vercel
+        "https://tesisweb-akz5-md0p6c0uw-barbaras-projects-c40cbbb4.vercel.app"  # Preview
+    ],
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["Content-Type", "Authorization"],
 )
 
 # Endpoint manual para CORS preflight
