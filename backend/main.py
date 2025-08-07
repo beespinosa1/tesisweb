@@ -73,10 +73,14 @@ async def get_lexicon_stats():
 @app.post("/api/analyze", response_model=AnalysisResponse)
 async def analyze_gender_bias(request: AnalysisRequest):
     try:
+        print("🔍 Recibida descripción:", request.description)
+
         if not request.description.strip():
             raise HTTPException(status_code=400, detail="La descripción no puede estar vacía")
 
         results = analyzer.analyze(request.description)
+
+        print("✅ Resultado del análisis:", results)
 
         return AnalysisResponse(
             lexical_score=results["lexical_score"],
@@ -92,6 +96,7 @@ async def analyze_gender_bias(request: AnalysisRequest):
         )
 
     except Exception as e:
+        print("❌ Error interno:", str(e))
         raise HTTPException(status_code=500, detail=f"Error en el análisis: {str(e)}")
 
 @app.get("/api/analyzer/info")
