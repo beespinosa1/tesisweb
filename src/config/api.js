@@ -2,31 +2,21 @@
 const API_CONFIG = {
   // Desarrollo local
   development: {
-    baseURL: process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000',
+    baseURL: 'http://localhost:8000',
     timeout: 30000
   },
-  
-  // Desarrollo con ngrok
-  ngrok: {
-    baseURL: process.env.REACT_APP_BACKEND_URL || 'https://tu-url-ngrok.ngrok.io',
-    timeout: 30000
-  },
-  
-  // Producción (cuando tengas el backend en la nube)
+
+  // Producción (Railway)
   production: {
-    baseURL: process.env.REACT_APP_BACKEND_URL || 'https://tu-backend-produccion.com',
+    baseURL: 'https://tesisweb-production.up.railway.app', // <-- URL correcta del backend
     timeout: 30000
   }
 };
 
 // Determinar el entorno
 const getEnvironment = () => {
-  if (process.env.REACT_APP_API_MODE === 'ngrok') {
-    return 'ngrok';
-  }
-  if (process.env.NODE_ENV === 'production') {
-    return 'production';
-  }
+  const mode = process.env.REACT_APP_API_MODE;
+  if (mode === 'production') return 'production';
   return 'development';
 };
 
@@ -45,4 +35,4 @@ export const axiosConfig = {
   headers: {
     'Content-Type': 'application/json',
   }
-}; 
+};

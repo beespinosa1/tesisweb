@@ -1,8 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
 from pydantic import BaseModel
-from typing import Optional, Dict, List
+from typing import Dict, List
 import uvicorn
 from gender_bias_analyzer import analyzer
 
@@ -16,25 +15,13 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "https://tesisweb-akz5.vercel.app",  # Tu dominio exacto de Vercel
-        "https://tesisweb-akz5-md0p6c0uw-barbaras-projects-c40cbbb4.vercel.app"  # Preview
+        "https://tesisweb-akz5.vercel.app",
+        "https://tesisweb-akz5-md0p6c0uw-barbaras-projects-c40cbbb4.vercel.app"
     ],
     allow_credentials=True,
-    allow_methods=["GET", "POST", "OPTIONS"],
-    allow_headers=["Content-Type", "Authorization"],
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
-
-# Endpoint manual para CORS preflight
-@app.options("/api/analyze")
-async def options_analyze():
-    return JSONResponse(
-        content={},
-        headers={
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "POST, OPTIONS",
-            "Access-Control-Allow-Headers": "Content-Type, Authorization",
-        }
-    )
 
 # Modelo para la request
 class AnalysisRequest(BaseModel):
@@ -88,11 +75,11 @@ async def analyze_gender_bias(request: AnalysisRequest):
     try:
         if not request.description.strip():
             raise HTTPException(status_code=400, detail="La descripción no puede estar vacía")
-        
+
         # Realizar el análisis
         results = analyzer.analyze(request.description)
-        
-        response_data = AnalysisResponse(
+
+        return AnalysisResponse(
             lexical_score=results["lexical_score"],
             contextual_score=results["contextual_score"],
             final_prediction=results["final_prediction"],
@@ -104,17 +91,7 @@ async def analyze_gender_bias(request: AnalysisRequest):
             roberta_probabilities=results["roberta_probabilities"],
             is_tic=results["is_tic"]
         )
-        
-        # Retornar con headers CORS manuales
-        return JSONResponse(
-            content=response_data.dict(),
-            headers={
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Methods": "POST, OPTIONS",
-                "Access-Control-Allow-Headers": "Content-Type, Authorization",
-            }
-        )
-        
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error en el análisis: {str(e)}")
 
@@ -138,4 +115,4 @@ async def get_analyzer_info():
     }
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000) 
+    uvicorn.run(app, host="0.0.0.0", port=8000)
