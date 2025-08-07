@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Dict, List
@@ -10,7 +10,7 @@ app = FastAPI(
     version="2.0.0"
 )
 
-# CORS: permitir acceso desde tu frontend desplegado
+# Configurar CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -21,6 +21,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Endpoint manual para manejar preflight de CORS
+@app.options("/api/analyze")
+async def preflight_analyze(request: Request):
+    return {}
 
 # Modelo para la request
 class AnalysisRequest(BaseModel):
