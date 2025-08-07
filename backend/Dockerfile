@@ -4,7 +4,7 @@ FROM python:3.11-slim
 # Evita prompts interactivos
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Instala dependencias necesarias para compilar paquetes pesados como pandas y sklearn
+# Instala dependencias necesarias para compilar paquetes como pandas, numpy y sklearn
 RUN apt-get update && apt-get install -y \
     build-essential \
     gcc \
@@ -19,19 +19,16 @@ RUN apt-get update && apt-get install -y \
 # Establece el directorio de trabajo
 WORKDIR /app
 
-# Copia e instala dependencias
+# Copia archivo de dependencias e instala
 COPY requirements.txt .
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Fuerza la reinstalación de torch para evitar instalaciones corruptas
-RUN pip uninstall -y torch && pip install torch==2.1.2
-
-# Copia el resto del código
+# Copia el resto del proyecto
 COPY . .
 
-# Expone el puerto que Railway usará
+# Expone el puerto para Railway
 EXPOSE 8000
 
-# Comando para correr el backend con gunicorn (Flask)
+# Comando para ejecutar el backend con Uvicorn y FastAPI
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
