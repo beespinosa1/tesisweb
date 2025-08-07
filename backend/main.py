@@ -2,7 +2,6 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Dict, List
-import uvicorn
 from gender_bias_analyzer import analyzer
 
 app = FastAPI(
@@ -11,7 +10,7 @@ app = FastAPI(
     version="2.0.0"
 )
 
-# Configurar CORS para permitir requests desde el frontend
+# CORS: permitir acceso desde tu frontend desplegado
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -59,7 +58,6 @@ async def health_check():
 
 @app.get("/api/lexicon/stats")
 async def get_lexicon_stats():
-    """Obtiene estadísticas del lexicon cargado"""
     return {
         "masculine_terms_count": len(analyzer.masc_terms),
         "feminine_terms_count": len(analyzer.fem_terms),
@@ -69,14 +67,10 @@ async def get_lexicon_stats():
 
 @app.post("/api/analyze", response_model=AnalysisResponse)
 async def analyze_gender_bias(request: AnalysisRequest):
-    """
-    Analiza el sesgo de género en una descripción de oferta laboral
-    """
     try:
         if not request.description.strip():
             raise HTTPException(status_code=400, detail="La descripción no puede estar vacía")
 
-        # Realizar el análisis
         results = analyzer.analyze(request.description)
 
         return AnalysisResponse(
@@ -97,7 +91,6 @@ async def analyze_gender_bias(request: AnalysisRequest):
 
 @app.get("/api/analyzer/info")
 async def get_analyzer_info():
-    """Obtiene información sobre el analizador"""
     return {
         "model_version": "v2.0_ensemble",
         "features": {
@@ -113,6 +106,3 @@ async def get_analyzer_info():
             "neutral_terms": len(analyzer.neutral_terms)
         }
     }
-
-if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
