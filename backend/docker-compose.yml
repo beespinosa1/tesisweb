@@ -1,0 +1,18 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        PRELOAD_MODELS: "false"   # pon "true" en CI si quieres hornear los pesos
+    image: gender-bias-api:2.0.0
+    environment:
+      UVICORN_WORKERS: "1"       # cuidado: más workers = más RAM (modelo por worker)
+      HF_HOME: /hf-cache
+    volumes:
+      - hf-cache:/hf-cache       # cache persistente de HF entre reinicios
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+volumes:
+  hf-cache:

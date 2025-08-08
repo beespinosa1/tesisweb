@@ -18,7 +18,7 @@ app.add_middleware(
         "http://localhost:3000",
         "https://tesisweb-akz5.vercel.app",
         "https://tesisweb-akz5-md0p6c0uw-barbaras-projects-c40cbbb4.vercel.app",
-        "https://e8f0f017c553.ngrok-free.app"  # Cambia por tu URL actual de ngrok
+        "*"
     ],
     allow_credentials=True,
     allow_methods=["*"],
