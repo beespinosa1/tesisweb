@@ -24,10 +24,6 @@ RUN python -m pip install --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt && \
     python -m spacy download es_core_news_md
 
-# (Opcional) precargar modelos HF en build para mejorar cold start
-ARG PRELOAD_MODELS=true
-COPY preload_models.py ./preload_models.py
-RUN if [ "$PRELOAD_MODELS" = "true" ]; then python preload_models.py || true; fi
 
 # Usuario no-root
 RUN useradd -ms /bin/bash appuser && \
