@@ -1,5 +1,5 @@
 # Imagen base oficial de Python
-FROM python:3.11-slim
+FROM python:3.13.4-slim-bookworm
 
 # Evita prompts interactivos
 ENV DEBIAN_FRONTEND=noninteractive
