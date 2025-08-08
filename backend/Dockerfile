@@ -1,43 +1,34 @@
-# syntax=docker/dockerfile:1.7
-FROM python:3.13.4-slim-bookworm
+# Imagen base oficial de Python
+FROM python:3.11-slim
 
-ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1 \
-    PIP_NO_CACHE_DIR=1 \
-    HF_HOME=/hf-cache \
-    TOKENIZERS_PARALLELISM=false \
-    UVICORN_HOST=0.0.0.0 \
-    UVICORN_PORT=8000 \
-    UVICORN_WORKERS=1 \
-    APP_MODULE=main:app
+# Evita prompts interactivos
+ENV DEBIAN_FRONTEND=noninteractive
 
-# Paquetes del sistema (ligeros) útiles para numpy/torch/transformers
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    libstdc++6 libgomp1 curl \
- && rm -rf /var/lib/apt/lists/*
+# Instala dependencias necesarias para compilar paquetes como pandas, numpy y sklearn
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    gcc \
+    g++ \
+    python3-dev \
+    libatlas-base-dev \
+    libopenblas-dev \
+    liblapack-dev \
+    gfortran \
+    && rm -rf /var/lib/apt/lists/*
 
+# Establece el directorio de trabajo
 WORKDIR /app
 
-# Instala deps primero para aprovechar cache de capas
+# Copia archivo de dependencias e instala
 COPY requirements.txt .
-RUN python -m pip install --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt && \
-    python -m spacy download es_core_news_md
-
-
-# Usuario no-root
-RUN useradd -ms /bin/bash appuser && \
-    mkdir -p "$HF_HOME" && chown -R appuser:appuser "$HF_HOME" /app
-USER appuser
+RUN pip install --upgrade pip
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Copia el resto del proyecto
 COPY . .
 
+# Expone el puerto para Railway
 EXPOSE 8000
 
-# Healthcheck simple contra /health
-HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-  CMD curl -fsS http://localhost:${UVICORN_PORT}/health || exit 1
-
-# Ejecuta Uvicorn (configurable por env UVICORN_WORKERS)
-CMD ["sh", "-lc", "uvicorn $APP_MODULE --host $UVICORN_HOST --port $UVICORN_PORT --workers ${UVICORN_WORKERS}"]
+# Comando para ejecutar el backend con Uvicorn y FastAPI
+CMD ["gunicorn", "main:app", "--worker-class", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:8000"]
